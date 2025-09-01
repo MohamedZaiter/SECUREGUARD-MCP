@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureGuard Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2a6bc1;
+            --primary-dark: #1e5aa8;
+            --secondary: #7e57c2;
+            --accent: #26c6da;
+            --text-light: #f8fafc;
+            --text-dark: #2d3748;
+            --bg-dark: #1a202c;
+            --bg-card-dark: #2d3748;
+            --bg-card-light: #ffffff;
+            --border-dark: #4a5568;
+            --success: #48bb78;
+            --warning: #ecc94b;
+            --danger: #f56565;
+            --info: #4299e1;
+            --transition: all 0.3s ease;
+        }
+
+        .dark-mode {
+            --bg-primary: var(--bg-dark);
+            --bg-card: var(--bg-card-dark);
+            --text-primary: var(--text-light);
+            --text-secondary: #cbd5e0;
+            --border-color: var(--border-dark);
+        }
+
+        .light-mode {
+            --bg-primary: #f1f5f9;
+            --bg-card: var(--bg-card-light);
+            --text-primary: var(--text-dark);
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo i {
+            font-size: 24px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            width: 50px;
+            height: 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 3px;
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transition: transform 0.3s ease;
+        }
+
+        .dark-mode .toggle-thumb {
+            transform: translateX(25px);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            background: var(--bg-card);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .status-connected {
+            color: var(--success);
+        }
+
+        .status-disconnected {
+            color: var(--danger);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .card h3 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .chat-container {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            grid-column: 1 / -1;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 450px;
+            background: var(--bg-primary);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 5px;
+        }
+
+        .assistant-message {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .error-message {
+            background: rgba(245, 101, 101, 0.15);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        .tool-response {
+            background: rgba(72, 187, 120, 0.1);
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            color: var(--text-primary);
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-card);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .chat-input input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(42, 107, 193, 0.3);
+        }
+
+        .chat-input button {
+            margin-left: 10px;
+            padding: 14px 25px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .chat-input button:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .chat-input button.clear-btn {
+            background: linear-gradient(135deg, var(--danger), #e53e3e);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin: 15px 20px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            padding: 10px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-action:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 20px 15px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .metric:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            display: block;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--bg-primary);
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            margin: 0 2px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.3s linear infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+        
+        @keyframes bounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .system-status-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .system-status-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .system-status-item strong {
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-value {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .status-value.connected {
+            color: var(--success);
+        }
+
+        .status-value.disconnected {
+            color: var(--danger);
+        }
+
+        .status-value.warning {
+            color: var(--warning);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .chat-container {
+                height: 500px;
+            }
+            
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .quick-actions {
+                justify-content: center;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h1>SecureGuard Dashboard</h1>
+                    <p>Security Monitoring & Analysis Platform</p>
+                    <span class="status-indicator">
+                        <i class="fas fa-circle-check status-connected"></i>
+                        <span>MCP Connected</span>
+                    </span>
+                </div>
+            </div>
+            <div class="theme-toggle" id="theme-toggle">
+                <div class="toggle-thumb"></div>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <h3><i class="fas fa-chart-bar"></i> Security Metrics</h3>
+                <div id="metrics" class="metrics">
+                    <div class="metric">
+                        <span class="metric-value">5</span>
+                        <span class="metric-label">Organizations</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">2</span>
+                        <span class="metric-label">Active Cases</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">1</span>
+                        <span class="metric-label">Critical Cases</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">1</span>
+                        <span class="metric-label">High Risk Orgs</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-server"></i> System Status</h3>
+                <div id="system-status">
+                    <div class="system-status-item">
+                        <strong><i class="fas fa-server"></i> Flask Server</strong>
+                        <span class="status-value connected">Running</span>
+                    </div>
+                    <div class="system-status-item">
+                        <strong><i class="fas fa-plug"></i> MCP Server</strong>
+                        <span class="status-value connected">Connected (8 Tools)</span>
+                    </div>
+                    <div class="system-status-item">
+                        <strong><i class="fas fa-brain"></i> Groq LLM</strong>
+                        <span class="status-value connected">Available</span>
+                    </div>
+                    <div class="system-status-item">
+                        <strong><i class="fas fa-user"></i> Session</strong>
+                        <span class="status-value">Active (0 Conversations)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <i class="fas fa-comments"></i> SecureGuard Assistant
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message assistant-message">
+                    <strong>Hello!</strong> I'm your SecureGuard assistant. I can help you with security monitoring, case analysis, and organization management. Try asking me about:
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Security summary</li>
+                        <li>Active cases</li>
+                        <li>Organization details</li>
+                        <li>Security signals</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="quick-actions">
+                <button class="quick-action" onclick="sendQuickQuery('Get security summary')">
+                    <i class="fas fa-chart-pie"></i> Security Summary
+                </button>
+                <button class="quick-action" onclick="sendQuickQuery('List active cases')">
+                    <i class="fas fa-exclamation-circle"></i> Active Cases
+                </button>
+                <button class="quick-action" onclick="sendQuickQuery('Show all organizations')">
+                    <i class="fas fa-building"></i> Organizations
+                </button>
+                <button class="quick-action" onclick="sendQuickQuery('tool: health')">
+                    <i class="fas fa-heartbeat"></i> Health Check
+                </button>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chat-input" placeholder="Ask about security status, cases, organizations..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()" id="send-btn">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+                <button onclick="clearChat()" class="clear-btn">
+                    <i class="fas fa-broom"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLoading = false;
+        
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            body.classList.toggle('light-mode');
+            
+            // Save theme preference to localStorage
+            const isDarkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        });
+        
+        // Load saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+            } else {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+            }
+            
+            // Load initial data
+            loadMetrics();
+            loadSystemStatus();
+        });
+
+        async function loadMetrics() {
+            try {
+                // In a real application, you would fetch this from your API
+                // const response = await fetch('/api/mcp/summary');
+                // const data = await response.json();
+                
+                // For demo purposes, we'll use static data
+                const data = {
+                    total_organizations: 5,
+                    active_cases: 2,
+                    critical_cases: 1,
+                    high_risk_organizations: 1
+                };
+                
+                const metricsHtml = `
+                    <div class="metric">
+                        <span class="metric-value">${data.total_organizations || 0}</span>
+                        <span class="metric-label">Organizations</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">${data.active_cases || 0}</span>
+                        <span class="metric-label">Active Cases</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">${data.critical_cases || 0}</span>
+                        <span class="metric-label">Critical Cases</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">${data.high_risk_organizations || 0}</span>
+                        <span class="metric-label">High Risk Orgs</span>
+                    </div>
+                `;
+                document.getElementById('metrics').innerHTML = metricsHtml;
+            } catch (error) {
+                document.getElementById('metrics').innerHTML = `<div style="color: var(--danger); padding: 20px; text-align: center;">Failed to load metrics</div>`;
+            }
+        }
+
+        async function loadSystemStatus() {
+            try {
+                // In a real application, you would fetch this from your API
+                // const response = await fetch('/api/status');
+                // const data = await response.json();
+                
+                // For demo purposes, we'll use static data
+                const data = {
+                    mcp_server: {
+                        connected: true,
+                        tools_count: 8
+                    },
+                    groq_llm: {
+                        available: true
+                    },
+                    session_info: {
+                        current_session: true,
+                        active_conversations: 0
+                    }
+                };
+                
+                const statusHtml = `
+                    <div class="system-status-item">
+                        <strong><i class="fas fa-server"></i> Flask Server</strong>
+                        <span class="status-value connected">Running</span>
+                    </div>
+                    <div class="system-status-item">
+                        <strong><i class="fas fa-plug"></i> MCP Server</strong>
+                        <span class="status-value ${data.mcp_server.connected ? 'connected' : 'disconnected'}">
+                            ${data.mcp_server.connected ? 'Connected' : 'Disconnected'} (${data.mcp_server.tools_count} Tools)
+                        </span>
+                    </div>
+                    <div class="system-status-item">
+                        <strong><i class="fas fa-brain"></i> Groq LLM</strong>
+                        <span class="status-value ${data.groq_llm.available ? 'connected' : 'warning'}">
+                            ${data.groq_llm.available ? 'Available' : 'API Key Missing'}
+                        </span>
+                    </div>
+                    <div class="system-status-item">
+                        <strong><i class="fas fa-user"></i> Session</strong>
+                        <span class="status-value">
+                            ${data.session_info.current_session ? 'Active' : 'None'}
+                            (${data.session_info.active_conversations} Conversations)
+                        </span>
+                    </div>
+                `;
+                document.getElementById('system-status').innerHTML = statusHtml;
+            } catch (error) {
+                document.getElementById('system-status').innerHTML = `<div style="color: var(--danger); padding: 10px; text-align: center;">Failed to load status</div>`;
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                sendMessage();
+            }
+        }
+
+        function sendQuickQuery(query) {
+            document.getElementById('chat-input').value = query;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const query = input.value.trim();
+            
+            if (!query || isLoading) return;
+            
+            const messagesDiv = document.getElementById('chat-messages');
+            const sendBtn = document.getElementById('send-btn');
+            
+            // Add user message
+            addMessage(query, 'user');
+            input.value = '';
+            
+            // Show loading state
+            isLoading = true;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            sendBtn.disabled = true;
+            
+            try {
+                // Create a new message element for the assistant's response
+                const messageId = 'msg-' + Date.now();
+                const messageDiv = document.createElement('div');
+                messageDiv.id = messageId;
+                messageDiv.className = 'message assistant-message';
+                messageDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                
+                // Simulate API response for demo purposes
+                setTimeout(() => {
+                    const messageEl = document.getElementById(messageId);
+                    if (query.toLowerCase().includes('summary')) {
+                        messageEl.innerHTML = "Here's your security summary:<br><br>" +
+                            "• Organizations: 5<br>" +
+                            "• Active Cases: 2<br>" +
+                            "• Critical Cases: 1<br>" +
+                            "• Security Signals: 4<br><br>" +
+                            "Everything is running smoothly. No critical issues detected.";
+                    } else if (query.toLowerCase().includes('organization')) {
+                        messageEl.innerHTML = "Organizations monitored:<br><br>" +
+                            "• OrgA (Technology, Medium Risk)<br>" +
+                            "• OrgB (Finance, High Risk)<br>" +
+                            "• OrgC (Healthcare, Low Risk)<br>" +
+                            "• OrgD (Technology, Medium Risk)<br>" +
+                            "• OrgE (Retail, Low Risk)<br><br>" +
+                            "Would you like details on any specific organization?";
+                    } else {
+                        messageEl.innerHTML = "I've processed your request: \"" + query + "\".<br><br>" +
+                            "Is there anything else you'd like to know about your security status?";
+                    }
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    
+                    isLoading = false;
+                    sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+                    sendBtn.disabled = false;
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage(`Error: ${error.message}`, 'error');
+                isLoading = false;
+                sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+                sendBtn.disabled = false;
+            }
+        }
+
+        function addMessage(content, type) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            
+            if (type === 'tool_response') {
+                messageDiv.innerHTML = `<pre>${content}</pre>`;
+            } else {
+                messageDiv.innerHTML = content;
+            }
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        async function clearChat() {
+            try {
+                // In a real application, you would call your API
+                // await fetch('/api/clear', { method: 'POST' });
+                
+                document.getElementById('chat-messages').innerHTML = `
+                    <div class="message assistant-message">
+                        <strong>Chat cleared!</strong> How can I help you with SecureGuard today?
+                    </div>
+                `;
+            } catch (error) {
+                addMessage(`Error clearing chat: ${error.message}`, 'error');
+            }
+        }
+
+        // Refresh metrics every 30 seconds
+        setInterval(loadMetrics, 30000);
+        setInterval(loadSystemStatus, 60000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+# SecureGuard Configuration
+
+# LLM Configuration
+llm:
+  model: "openai/gpt-oss-120b"
+  base_url: "https://api.openai.com/v1"
+  max_tokens: 2000
+  temperature: 0.7
+
+# MCP Server Configuration
+mcp:
+  url: "http://localhost:9002/sse"  # Changed to match SSE endpoint
+  timeout: 30
+  retry_attempts: 3
+
+# Web Server Configuration
+web:
+  host: "0.0.0.0"
+  port: 5000
+  debug: true
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Session Configuration
+session:
+  secret_key: "dev-key-change-in-production"
+  timeout: 3600  # 1 hour
+
+# Security Headers
+security:
+  cors_enabled: true
+  allowed_origins: ["http://localhost:5000", "http://127.0.0.1:5000"]

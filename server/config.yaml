@@ -1,0 +1,61 @@
+name: "SecureGuard-MCP"
+host: "0.0.0.0"
+port: 9002
+transport: "sse"
+
+# Server configuration
+server:
+  debug: false
+  reload: false
+  workers: 1
+
+# Security configuration
+security:
+  cors_enabled: true
+  allowed_origins: 
+    - "http://localhost:5000"
+    - "http://127.0.0.1:5000"
+    - "http://localhost:3000"
+    - "http://127.0.0.1:3000"
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "mcp_server.log"
+
+# Data configuration (for demo/mock data)
+data:
+  organizations:
+    - name: "OrgA"
+      type: "technology"
+      employees: 1500
+      risk_level: "medium"
+    - name: "OrgB"
+      type: "finance"
+      employees: 800
+      risk_level: "high"
+    - name: "OrgC"
+      type: "healthcare"
+      employees: 2200
+      risk_level: "low"
+    - name: "OrgD"
+      type: "technology"
+      employees: 3500
+      risk_level: "medium"
+    - name: "OrgE"
+      type: "retail"
+      employees: 1200
+      risk_level: "low"
+
+# Performance configuration
+performance:
+  timeout: 30
+  max_connections: 100
+  keep_alive: 5
+
+# Monitoring configuration
+monitoring:
+  health_check_interval: 30
+  metrics_enabled: true
+  prometheus_port: 9090
