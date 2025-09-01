@@ -2,7 +2,8 @@
 
 A modern security monitoring and analysis platform with AI-powered assistance, built using Flask, MCP (Model Context Protocol), and Groq LLM integration.
 
-![SecureGuard Dashboard ](/home/zaiter/Downloads/secureguard-mcp/client/templates/Screenshot From 2025-09-01 15-27-06.png)
+<img width="1920" height="1005" alt="Screenshot From 2025-09-01 15-27-06" src="https://github.com/user-attachments/assets/ad1a417f-de32-4a33-9a4b-f63085d470a7" />
+
 
 ## Features
 
